@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exceljs and populate</title>
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+<!--
+
+    <script src="/assets/polyfill.min.js_7.10.4/cdnjs/polyfill.min.js"></script>
+    <script src="/assets/exceljs/dist/exceljs.bare.js"></script>
+-->
+
+    <script>
+        const worker = new Worker("/assets/excel/excel.js");
+
+        worker.onmessage = function(messageEvent){
+            console.log( messageEvent.data );
+            switch (messageEvent.data.type){
+                case "blob" :
+                    const url = window.URL.createObjectURL(messageEvent.data.data);
+                    const anchor = document.createElement('a');
+                    anchor.href = url;
+                    anchor.download = `테스트.xlsx`;
+                    anchor.click();
+                    window.URL.revokeObjectURL(url);
+
+            }
+        }
+
+        let grid;
+        function test(){
+            console.log(grid);
+            worker.postMessage(1)
+        }
+        function fn_onLoad(){
+            let gridData = new Array();
+
+            for(let i = 0 ; i < 1000; i++){
+                gridData.push({artist: "Birdy"+i
+                    ,downloadCount: 1000
+                    ,genre: "Pop"
+                    ,genreCode: "1"
+                    ,grade: "2"
+                    ,id: 549731
+                    ,listenCount: 5000
+                    ,name: "Beautiful Lies"
+                    ,price: 10000
+                    ,release: "2016.03.26"
+                    ,rowKey: 0
+                    ,type: "Deluxe"
+                    ,typeCode: "1"})
+            }
+            grid = new tui.Grid({
+                el: document.getElementById('grid'),
+                scrollX: false,
+                scrollY: false,
+                data: gridData,
+                bodyHeight : 400,
+                header: {
+                    height: 160,
+                    complexColumns: [
+                        {
+                            header: 'Basic',
+                            name: 'mergeColumn1',
+                            childNames: ['name', 'artist']
+                        },
+                        {
+                            header: 'Extra',
+                            name: 'mergeColumn2',
+                            childNames: ['type', 'release', 'genre']
+                        },
+                        {
+                            header: 'Detail',
+                            name: 'mergeColumn3',
+                            childNames: ['mergeColumn1', 'mergeColumn2']
+                        },
+                        {
+                            header: 'Count',
+                            name: 'mergeColumn4',
+                            childNames: ['downloadCount', 'listenCount']
+                        },
+                        {
+                            header: 'Album Info',
+                            name: 'mergeColumn5',
+                            childNames: ['price', 'mergeColumn3', 'mergeColumn4']
+                        }
+                    ]
+                },
+                columns: [
+                    {
+                        header: 'Name',
+                        name: 'name'
+                    },
+                    {
+                        header: 'Artist',
+                        name: 'artist'
+                    },
+                    {
+                        header: 'Type',
+                        name: 'type'
+                    },
+                    {
+                        header: 'Release',
+                        name: 'release'
+                    },
+                    {
+                        header: 'Genre',
+                        name: 'genre'
+                    },
+                    {
+                        header: 'Price',
+                        name: 'price'
+                    },
+                    {
+                        header: 'Download',
+                        name: 'downloadCount'
+                    },
+                    {
+                        header: 'Listen',
+                        name: 'listenCount'
+                    }
+                ]
+            });
+
+        }
+    </script>
+</head>
+<body onload="fn_onLoad()">
+<input type="button" value="excel" onclick="test()">
+<input type="button" value="start">
+<input type="button" value="end">
+<p>GRID</p>
+<div id="grid">
+
+    aa
+</div>
+</body>
+</html>
