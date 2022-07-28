@@ -265,7 +265,9 @@ var CSV = /*#__PURE__*/function () {
     value: function () {
       var _writeBuffer = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(options) {
         var stream;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+		  console.log("asdfaasdfasdfasdfasdfasdf");
+
+		  return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:

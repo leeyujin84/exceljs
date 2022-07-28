@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <title>Exceljs and populate</title>
     <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.css" />
-    <script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
-<!--
+	<link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css" />
 
-    <script src="/assets/polyfill.min.js_7.10.4/cdnjs/polyfill.min.js"></script>
-    <script src="/assets/exceljs/dist/exceljs.bare.js"></script>
--->
+	<script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.js"></script>
+	<script src="https://uicdn.toast.com/grid/latest/tui-grid.js"></script>
+	<!--
+
+		<script src="/assets/polyfill.min.js_7.10.4/cdnjs/polyfill.min.js"></script>
+		<script src="/assets/exceljs/dist/exceljs.bare.js"></script>
+	-->
 
     <script>
         const worker = new Worker("/assets/excel/excel.js");
@@ -24,103 +27,96 @@
                     anchor.download = `테스트.xlsx`;
                     anchor.click();
                     window.URL.revokeObjectURL(url);
+					break;
+				case "message":
+					console.log(`${new Date()} ${messageEvent.data.data}`)
+					break;
 
             }
         }
 
         let grid;
         function test(){
-            console.log(grid);
-            worker.postMessage(1)
+			console.log(grid)
+			let columns = grid.getColumns().map(function(column){
+				return {header : column.header
+					  , key : column.name
+					  , width : column.width
+					  , formatter : column.formatter
+				}
+			});
+
+			let data = grid.getData();
+
+			console.log(data);
+
+
+			if(true /*isCurrent*/){
+
+
+			}else{
+
+			}
+			console.log(data);
+            worker.postMessage({
+				  type:"export"
+				, data : {
+					fileName: "파일명.xlsx",
+					creator : 'lee.yj',
+					worksheets: [{
+						sheetName : "aaa",
+						columns: columns,
+						data: data
+					},{
+						sheetName : "aaab",
+						columns: columns,
+						data: data
+					}],
+					password : '1234'
+				}
+			})
         }
         function fn_onLoad(){
             let gridData = new Array();
 
             for(let i = 0 ; i < 1000; i++){
-                gridData.push({artist: "Birdy"+i
-                    ,downloadCount: 1000
-                    ,genre: "Pop"
-                    ,genreCode: "1"
-                    ,grade: "2"
-                    ,id: 549731
-                    ,listenCount: 5000
-                    ,name: "Beautiful Lies"
-                    ,price: 10000
-                    ,release: "2016.03.26"
-                    ,rowKey: 0
-                    ,type: "Deluxe"
-                    ,typeCode: "1"})
+                gridData.push({
+					columnChar: 'Y',
+					columnString: 'String가나다!@#$#',
+					columnInt: 999,
+					columnLong: 999999999999999,
+					columnDouble: 99.99,
+					columnBoolean: true,
+					columnDate: new Date(),
+					columnLocalDateTime: new Date(),
+				})
             }
+
             grid = new tui.Grid({
                 el: document.getElementById('grid'),
                 scrollX: false,
                 scrollY: false,
-                data: gridData,
-                bodyHeight : 400,
-                header: {
-                    height: 160,
-                    complexColumns: [
-                        {
-                            header: 'Basic',
-                            name: 'mergeColumn1',
-                            childNames: ['name', 'artist']
-                        },
-                        {
-                            header: 'Extra',
-                            name: 'mergeColumn2',
-                            childNames: ['type', 'release', 'genre']
-                        },
-                        {
-                            header: 'Detail',
-                            name: 'mergeColumn3',
-                            childNames: ['mergeColumn1', 'mergeColumn2']
-                        },
-                        {
-                            header: 'Count',
-                            name: 'mergeColumn4',
-                            childNames: ['downloadCount', 'listenCount']
-                        },
-                        {
-                            header: 'Album Info',
-                            name: 'mergeColumn5',
-                            childNames: ['price', 'mergeColumn3', 'mergeColumn4']
-                        }
-                    ]
-                },
+				data : {
+					initialRequest : true,
+					api: {
+						readData: { url: '/api/v1/readData', method: 'GET' }
+					},
+				},
+				bodyHeight : 400,
+				pageOptions : {
+					useClient: false,
+					perPage : 10
+				},
                 columns: [
-                    {
-                        header: 'Name',
-                        name: 'name'
-                    },
-                    {
-                        header: 'Artist',
-                        name: 'artist'
-                    },
-                    {
-                        header: 'Type',
-                        name: 'type'
-                    },
-                    {
-                        header: 'Release',
-                        name: 'release'
-                    },
-                    {
-                        header: 'Genre',
-                        name: 'genre'
-                    },
-                    {
-                        header: 'Price',
-                        name: 'price'
-                    },
-                    {
-                        header: 'Download',
-                        name: 'downloadCount'
-                    },
-                    {
-                        header: 'Listen',
-                        name: 'listenCount'
-                    }
-                ]
+					{header: 'Char', name: 'columnChar' },
+					{header: 'String', name: 'columnString' },
+					{header: 'Int', name: 'columnInt' },
+					{header: 'Long', name: 'columnLong' },
+					{header: 'Double', name: 'columnDouble' },
+					{header: 'Boolean', name: 'columnBoolean' },
+					{header: 'Date', name: 'columnDate' },
+					{header: 'LocalDateTime', name: 'columnLocalDateTime' },
+				]
             });
 
         }
@@ -128,12 +124,19 @@
 </head>
 <body onload="fn_onLoad()">
 <input type="button" value="excel" onclick="test()">
-<input type="button" value="start">
-<input type="button" value="end">
 <p>GRID</p>
+<a href="https://nhn.github.io/tui.grid/latest/">https://nhn.github.io/tui.grid/latest/</a>
 <div id="grid">
 
     aa
 </div>
+
+
+
+
+
+
+
+
 </body>
 </html>
